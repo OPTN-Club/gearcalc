@@ -12,6 +12,6 @@ add_executable (GearCalcListen "GearCalcListen.c" "GearCalcListen.h")
 include(FileEmbed.cmake)
 
 FileEmbedSetup()
-FileEmbedAdd(${CMAKE_SOURCE_DIR}/blank2.html)
+FileEmbedAdd(${CMAKE_SOURCE_DIR}/blank.html)
 
 target_link_libraries(GearCalcListen file_embed)
