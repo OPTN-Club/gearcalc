@@ -7,7 +7,7 @@ from bokeh.layouts import row, column
 from bokeh.palettes import Paired12 as palette
 
 # Specify a file to write the plot to
-output_file("blank2.html")
+output_file("blank.html")
 
 p = figure(plot_height=400, plot_width=1200, width_policy='fixed', title="Gear Ratio Tuner")
 line = p.line([1],[1], color=palette[0], line_width=3)

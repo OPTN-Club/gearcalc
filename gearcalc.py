@@ -7,7 +7,7 @@ from bokeh.layouts import row, column
 from bokeh.palettes import Paired12 as palette
 
 # Specify a file to write the plot to
-output_file("index.html")
+output_file("blank.html")
 
 
 #consts

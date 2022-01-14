@@ -5,7 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
-#include <blank2_html.h>
+#include <blank_html.h>
 #include "GearCalcListen.h"
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
@@ -30,7 +30,7 @@ int main()
 	char buf[BUFLEN];
 	WSADATA wsa_data;
 	version_requested = MAKEWORD(2, 2);
-	
+
 
 	slen = sizeof(si_other);
 
@@ -95,6 +95,11 @@ int main()
 				}
 			}
 		}
+		for (int i = 0; i < NUM_DATA_POINTS; i++) {
+			if (torque_values[i] == 0) {
+				printf("missing rpm: %f\n", rpm_values[i]);
+			}
+		}
 		if (num_collected == NUM_DATA_POINTS) {
 			break;
 		}
@@ -104,16 +109,23 @@ int main()
 	//all data collected, print it here
 	printf("Done collecting! Here's your data.\n");
 
-	
+	int i = 0;
+	size_t last_offset = NULL;
+	char* search_offset = NULL;
+	while((search_offset = strstr(blank_html_data+last_offset+15, "\"torque_curve\":")) != NULL){
+		printf("%p\n", search_offset);
+		last_offset = blank_html_data - search_offset;
+	}
+
 	OFSTRUCT outstruct;
 	HFILE out_file = OpenFile("notblank.html", &outstruct, OF_CREATE);
-	printf("%s\n", blank2_html_data);
-	char* pos = strstr(blank2_html_data, "{\"x\":[1]");
+	printf("%s\n", blank_html_data);
+	char* pos = strstr(blank_html_data, "{\"x\":[1]");
 	if (pos == NULL) {
 		printf("HTML is wrong\n");
 		return -1;
 	}
-	size_t offset = pos - (char*)blank2_html_data;
+	size_t offset = pos - (char*)blank_html_data;
 	size_t end_of_data = offset + 17;
 	int float_len = 0;
 	for (int i = 0; i < NUM_DATA_POINTS; i++) {
@@ -130,19 +142,19 @@ int main()
 	}
 	float_len = float_len + 5;
 	printf("%d\n", float_len);
-	char* out_buffer = malloc(float_len*sizeof(char)*NUM_DATA_POINTS*2 + blank2_html_size);
+	char* out_buffer = malloc(float_len*sizeof(char)*NUM_DATA_POINTS*2 + blank_html_size);
 	if (out_buffer == NULL) {
 		printf("out of memory\n");
 		return -1;
 	}
-	memset(out_buffer, 0, float_len * sizeof(char) * NUM_DATA_POINTS * 2 + blank2_html_size);
-	memcpy(out_buffer, blank2_html_data, offset);
-	
+	memset(out_buffer, 0, float_len * sizeof(char) * NUM_DATA_POINTS * 2 + blank_html_size);
+	memcpy(out_buffer, blank_html_data, offset);
+
 	lstrcat(out_buffer, "{\"x\":[");
-	
+
 	for (int i = 0; i < NUM_DATA_POINTS; i++) {
 		int len = snprintf(NULL, 0, "%f", rpm_values[i]);
-		char* result = (char*)malloc(len+1);	
+		char* result = (char*)malloc(len+1);
 		if (result == NULL) {
 			printf("out of memory\n");
 			return -1;
@@ -171,8 +183,8 @@ int main()
 		free(result);
 	}
 	lstrcat(out_buffer, "]}");
-	
-	lstrcat(out_buffer, blank2_html_data + end_of_data);
+
+	lstrcat(out_buffer, blank_html_data + end_of_data);
 	WriteFile(out_file, out_buffer, strlen(out_buffer), NULL, NULL);
 	free(out_buffer);
 	CloseHandle(out_file);
