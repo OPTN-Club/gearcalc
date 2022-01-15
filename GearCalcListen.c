@@ -79,7 +79,7 @@ int main()
 		if (latest_packet->car_ordinal != curr_car_ordinal) {
 			printf("New car!\n");
 			curr_car_ordinal = latest_packet->car_ordinal;
-			float rpm_range = (latest_packet->max_rpm-500) - latest_packet->idle_rpm;
+			float rpm_range = (latest_packet->max_rpm*.9) - latest_packet->idle_rpm;
 			float step_size = rpm_range / NUM_DATA_POINTS;
 			for (int i = 0; i < NUM_DATA_POINTS; i++) {
 				rpm_values[i] = latest_packet->idle_rpm + (step_size * i);
@@ -96,7 +96,7 @@ int main()
 			}
 		}
 		for (int i = 0; i < NUM_DATA_POINTS; i++) {
-			if (torque_values[i] == 0) {
+			if (torque_values[i] == 0 && rpm_values[i] > 0) {
 				printf("missing rpm: %f\n", rpm_values[i]);
 			}
 		}
