@@ -96,7 +96,7 @@ int main()
 			}
 		}
 		for (int i = 0; i < NUM_DATA_POINTS; i++) {
-			if (torque_values[i] == 0) {
+			if (torque_values[i] == 0 && rpm_values[i] > 0) {
 				printf("missing rpm: %f\n", rpm_values[i]);
 			}
 		}
