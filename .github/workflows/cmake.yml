@@ -37,6 +37,7 @@ jobs:
     - name: Store EXE
       uses: actions/upload-artifact@v2
       with:
+        name: gear-calc
         path: ${{github.workspace}}/build/Release/GearCalcListen.exe
 
       
